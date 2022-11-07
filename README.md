@@ -1,106 +1,20 @@
-[![Compile Handler](https://github.com/himbeles/mac-device-connect-daemon/workflows/Compile%20Handler/badge.svg?branch=master)](https://github.com/himbeles/mac-device-connect-daemon/actions?query=workflow%3A%22Compile+Handler%22)
+Fork of [mac-device-connect-daemon](https://github.com/himbeles/mac-device-connect-daemon) that adds a Makefile and script for generating Parallels VID/PID USB device auto-watchers.
 
-# Run shell script or executable triggered by device detection on a Mac
+Parallels does not seem to feature USB device filtering based on VID/PID like VirtualBox - only on full device specifier including serial etc. This means one cannot filter and attach all instances of a particular device to a guest OS, each device must be manually added. For embedded development using lots of USB serial, programmers etc this can become quite frustrating!
 
-This tutorial describes how to run an arbitrary executable or shell script triggered by the connection of an external device (usb/thunderbolt) to a Mac.
+I found it annoying enough to make this script. A LaunchAgent calls './prlusbwatch/prlusbwatch.sh' when a VID and PID defined in the LaunchAgent .plist file is attached. The script uses `prlsrvctrl` and `prlctl` to obtain the UUID of the passed guest (also in .plist) and check whether any connected USB devices with the that VID/PID are not configured to autoconnect to that VM. If found, they are set to autoconnect to the guest. Devices found to be set to autoconnect to the host are ignored to allow manual override.
 
-This relies on Apple's `IOKit` library for device detection and a daemon for running the desired executable.
-See BSD man page on `xpc_events`:
-```sh
-man xpc_events
-```
+# Usage
 
-For the daemon to not be triggered repeatedly after connecting the device, a special stream handler (created by [Ford Parsons](https://github.com/snosrap/xpc_set_event_stream_handler/blob/master/xpc_set_event_stream_handler/main.m)) is used to "consume" the `com.apple.iokit.matching` event, as explained [here](https://github.com/snosrap/xpc_set_event_stream_handler).
+1. Make a .plist for a device one wishes to filter on VID/PID and attach to a guest. Here 'jlink' will be the device name use for the file naming and log file; 'Arch' is the guest name or can be UUID; followed by VID PID:
 
-For example, this can be used to spoof the MAC address of an ethernet adapter when it is connected to the Mac.
-The setup is explained using the MAC spoofing scenario example files in `example-spoof-MAC` but can be generalized to arbitrary executables and devices.
+`./prlusbwatch/makeplist.sh jlink Arch 0x1366 0x1050`
 
+2. Install: `make install`
+3. Load: `make load`
 
-## Put your shell script or executable into place
+One may get a notification of the xpc_set_event_stream_handler being added as a LaunchAgent.
 
-Adapt the shell script `spoofmac.sh` to your needs and
-make it executable:
+Log files can be viewed at '/tmp/prlusbwatch.jlink.log' in this example.
 
-```
-sudo chmod 755 spoofmac.sh
-```
-
-Then move it into `/usr/local/bin`, or some other directory:
-
-```
-cp spoofmac.sh /usr/local/bin/
-```
-
-## Building the stream handler
-
-The stream handler is universal (no need to adapt) and can be built on a Mac (with xcode installed):
-
-```
-gcc -framework Foundation -o xpc_set_event_stream_handler xpc_set_event_stream_handler.m
-```
-
-Let's place it into `/usr/local/bin`, like the main executable for the daemon.
-
-```
-cp xpc_set_event_stream_handler /usr/local/bin/
-```
-
-The stream handler is also compiled via a [Github Action](https://github.com/himbeles/mac-device-connect-daemon/actions?query=workflow%3A%22Compile+Handler%22) on every commit. 
-This uses a Github `macos-latest` machine. 
-
-
-## Setup the daemon
-
-The plist file `com.spoofmac.plist` contains the properties of the daemon that will run the executable on device connect trigger.
-
-It contains information for identifying the device you want to base your trigger on, like `idVendor`, `idProduct`, `IOProviderClass`. 
-Get them via the output of
-```sh
-ioreg -p IOProviderClass -l
-```
-where `<IOProviderClass>` should be either `IOPCI` (Thunderbolt) or `IOUSB` (USB).
-
-The identifiers can also be obtained from the `System Information` App on your Mac.
-
-![Screenshot System Information](example-spoof-MAC/screenshot-system-info.png)
-
-Convert the hex identifiers to integers before inserting into the plist file (for example using `int(0x8086)` in python).
-
-`IOProviderClass` should be either `IOPCIDevice` (Thunderbolt) or `IOUSBDevice` (USB).
-
-The other relevant entry in the plist file is the location of `xpc_set_event_stream_handler` and the executable.
-
-Other entries include the location of standard output (log) files and the executing user.
-
-
-Since MAC spoofing requires root privileges, we put `com.spoofmac.plist` into `/Library/LaunchDaemons`:
-
-```
-cp com.spoofmac.plist /Library/LaunchDaemons/
-```
-
-not into a `LaunchAgents` folder. Launch agents ignore the `UserName` argument.
-
-Insure that the owner of the file is `root`:
-
-```
-sudo chown root:wheel /Library/LaunchDaemons/com.spoofmac.plist
-```
-
-## Launch the daemon
-
-Activate the daemon:
-
-```
-launchctl load /Library/LaunchDaemons/com.spoofmac.plist
-```
-
-and you are good to go.
-
-
-Unloading is done using `launchctl unload`.
-
-## Support me
-If you like this tutorial and code and you would like to support me,
-
-<a href="https://www.buymeacoffee.com/lri" target="_blank"><img width="120" src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee"></a>
+To uninstall: `make uninstall`

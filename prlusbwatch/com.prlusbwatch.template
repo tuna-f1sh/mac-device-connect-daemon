@@ -27,7 +27,7 @@
 	<array>
 		<string>/usr/local/bin/xpc_set_event_stream_handler</string>
 		<string>/usr/local/bin/prlusbwatch.sh</string>
-		<string>$HOST</string>
+		<string>$GUEST</string>
 		<string>$VID_HEX</string>
 		<string>$PID_HEX</string>
 	</array>

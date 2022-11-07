@@ -5,6 +5,8 @@ PLIST_INSTALLS = $(addprefix $(INSTALL_AGENTS_PATH)/,$(notdir $(PLIST_FILES)))
 PLIST_LOADS = $(addprefix load-,$(notdir $(PLIST_FILES)))
 PLIST_UNLOADS = $(addprefix unload-,$(notdir $(PLIST_FILES)))
 
+default: load
+
 xpc_set_event_stream_handler: xpc_set_event_stream_handler.m
 	gcc -framework Foundation -o xpc_set_event_stream_handler xpc_set_event_stream_handler.m
 
@@ -15,7 +17,7 @@ install: xpc_set_event_stream_handler $(PLIST_INSTALLS)
 	cp -v xpc_set_event_stream_handler /usr/local/bin
 	cp -v prlusbwatch/prlusbwatch.sh /usr/local/bin
 
-uninstall:
+uninstall: unload
 	rm -v /usr/local/bin/xpc_set_event_stream_handler
 	rm -v /usr/local/bin/prlusbwatch.sh
 	rm -v ${PLIST_INSTALLS}
@@ -23,7 +25,7 @@ uninstall:
 load-%: ${PLIST_INSTALLS}
 	launchctl load $<
 
-load: $(PLIST_LOADS)
+load: install $(PLIST_LOADS)
 
 unload-%: ${PLIST_INSTALLS}
 	launchctl unload $<
