@@ -10,11 +10,26 @@ I found it annoying enough to make this script. A LaunchAgent calls './prlusbwat
 
 `./prlusbwatch/makeplist.sh jlink Arch 0x1366 0x1050`
 
-2. Install: `make install`
-3. Load: `make load`
+2. Set execute permissions for scripts:
+```
+chmod +x ./prlusbwatch/prlusbwatch.sh
+chmod +x ./prlusbwatch/makeplist.sh
+```
+3. Install: `make install`
+4. Load: `make load`
 
 One may get a notification of the xpc_set_event_stream_handler being added as a LaunchAgent.
 
 Log files can be viewed at '/tmp/prlusbwatch.jlink.log' in this example.
 
 To uninstall: `make uninstall`
+
+# Load/Unload
+
+Once installed, to load/unload a specific device (such as 'jlink' in the example): `make load-jlink`/`make unload-jlink`
+
+# Manual
+
+The script './prlusbwatch/prlusbwatch.sh' can be used to manually set all devices with VID/PID listed by Parallels:
+
+`./prlusbwatch/prlusbwatch.sh Arch 0x0fcf 0x1009`
