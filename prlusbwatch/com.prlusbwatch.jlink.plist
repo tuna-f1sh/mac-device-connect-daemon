@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>com.prlusbwatch.jlink.program</string>
+	<key>LaunchEvents</key>
+	<dict>
+		<key>com.apple.iokit.matching</key>
+		<dict>
+			<key>com.apple.device-attach</key>
+			<dict>
+				<key>IOMatchLaunchStream</key>
+				<true/>
+				<key>IOMatchStream</key>
+				<true/>
+				<key>IOProviderClass</key>
+				<string>IOUSBDevice</string>
+				<key>idProduct</key>
+				<integer>4176</integer>
+				<key>idVendor</key>
+				<integer>4966</integer>
+			</dict>
+		</dict>
+	</dict>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/usr/local/bin/xpc_set_event_stream_handler</string>
+		<string>/usr/local/bin/prlusbwatch.sh</string>
+		<string>67d3dde0-2b05-48dd-a49c-662486e50e35</string>
+		<string>0x1366</string>
+		<string>0x1050</string>
+	</array>
+	<key>StandardErrorPath</key>
+	<string>/tmp/prlusbwatch.jlink.log</string>
+	<key>StandardOutPath</key>
+	<string>/tmp/prlusbwatch.jlink.log</string>
+</dict>
+</plist>

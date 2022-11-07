@@ -18,6 +18,11 @@ if(args.count >= 2) {
     let task = Process()
     task.executableURL = URL(fileURLWithPath: args[1])
     task.arguments = Array(args[2...])
+    if (args.count >= 4) {
+        NSLog("USB launching %s %s %s", args[1], args[2], args[3]);
+    } else {
+        NSLog("USB launching %s", args[1]);
+    }
 
     try task.run()
 }
