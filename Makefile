@@ -22,11 +22,12 @@ ${INSTALL_AGENTS_PATH}/com.prlusbwatch.%.plist: ${PLIST_PATH}/com.prlusbwatch.%.
 
 install: xpc_set_event_stream_handler $(PLIST_INSTALLS)
 	cp -v xpc_set_event_stream_handler /usr/local/bin
-	cp -v prlusbwatch/prlusbwatch.sh /usr/local/bin
+	chmod +x prlusbwatch/prlusbwatch.sh
+	cp -v prlusbwatch/prlusbwatch.sh /usr/local/bin/prlusbwatch
 
 uninstall: unload
 	rm -v /usr/local/bin/xpc_set_event_stream_handler
-	rm -v /usr/local/bin/prlusbwatch.sh
+	rm -v /usr/local/bin/prlusbwatch
 	rm -v ${PLIST_INSTALLS}
 
 load-%: | ${PLIST_INSTALLS}

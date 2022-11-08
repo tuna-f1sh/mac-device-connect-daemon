@@ -20,7 +20,7 @@ chmod +x ./prlusbwatch/makeplist.sh
 
 One may get a notification of the xpc_set_event_stream_handler being added as a LaunchAgent.
 
-Log files can be viewed at '/tmp/prlusbwatch.jlink.log' in this example.
+Log files can be viewed at '/usr/local/var/log/prlusbwatch.jlink.log' in this example.
 
 To uninstall: `make uninstall`
 

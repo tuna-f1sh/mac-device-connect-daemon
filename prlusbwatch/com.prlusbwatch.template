@@ -26,14 +26,14 @@
 	<key>ProgramArguments</key>
 	<array>
 		<string>/usr/local/bin/xpc_set_event_stream_handler</string>
-		<string>/usr/local/bin/prlusbwatch.sh</string>
+		<string>/usr/local/bin/prlusbwatch</string>
 		<string>$GUEST</string>
 		<string>$VID_HEX</string>
 		<string>$PID_HEX</string>
 	</array>
 	<key>StandardErrorPath</key>
-	<string>/tmp/prlusbwatch.$DEV.log</string>
+  <string>/usr/local/var/log/prlusbwatch.$DEV.log</string>
 	<key>StandardOutPath</key>
-	<string>/tmp/prlusbwatch.$DEV.log</string>
+  <string>/usr/local/var/log/prlusbwatch.$DEV.log</string>
 </dict>
 </plist>
