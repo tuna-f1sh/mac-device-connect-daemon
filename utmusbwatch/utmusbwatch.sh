@@ -24,7 +24,7 @@ pid=$3
 echo "Running utmusbwatch for guest $guest on VID/PID $vid/$pid"
 # get UUID of guest if not a UUID
 if [[ "$guest" =~ ^[0-9a-zA-Z]{8}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{4}-[0-9a-zA-Z]{12}$ ]]; then
-  uuid="\"$guest\""
+  uuid=$guest
 else
   uuid=$($ubin/utmctl list | grep 'ArchLinux' | awk '{print $1}')
   echo "guest UUID $uuid"
@@ -32,6 +32,12 @@ fi
 
 if [[ -z $uuid ]]; then
   echo "Failed to get UUID of guest or not running"
+  exit 0
+fi
+
+status=$($ubin/utmctl status "$uuid")
+if [[ "$status" != "started" ]]; then
+  echo "$guest not running"
   exit 0
 fi
 
@@ -52,5 +58,5 @@ else
 fi
 
 # make string match for utmctl vid:pid in UUID
-vidpid="\"$vid:$pid\""
-eval $ubin/utmctl usb connect $uuid $vidpid
+vidpid="$vid:$pid"
+$ubin/utmctl usb connect "$uuid" "$vidpid"
